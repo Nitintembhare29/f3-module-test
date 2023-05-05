@@ -6,8 +6,8 @@ let officeDiv = document.querySelector(".office");
 let searchbar = document.querySelector("#filter");
 let message =  document.getElementsByClassName("message");
 let postOffices = [];
-var number  = 0;
 let pin = 000000;
+let useripaddress = "";
 
 button.addEventListener("click", ()=>{
     button.style.display = "none";
@@ -15,36 +15,38 @@ button.addEventListener("click", ()=>{
       .then((response) => response.json())
       .then((data) => {
         document.getElementById("heading").textContent += ` ${data.ip}`;
-       
-        getLocation(data.ip);
+        useripaddress = data.ip;
+        getLocation(useripaddress);
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
       });
 
   })
   
   function getLocation(ip) {
-    fetch(`http://ip-api.com/json/${ip}`)
+    fetch(`https://ipinfo.io/${ip}/geo?token=6370439e94bf29`) 
       .then((response) => response.json())
       .then((data) => {
-
+        let lat = data.loc.split(",")[0];
+        let lon = data.loc.split(",")[1];
+        console.log(data);
         dataDiv.innerHTML = `
-        <div><div><h4>Lat:  ${data.lat}</h4></div> <div><h4>Long:  ${data.lon}</h4></div> </div>
-        <div><div><h4>City:  ${data.city}</h4></div> <div><h4>Region:  ${data.regionName}</h4></div> </div>
+        <div><div><h4>Lat:  ${lat}</h4></div> <div><h4>Long:  ${lon}</h4></div> </div>
+        <div><div><h4>City:  ${data.city}</h4></div> <div><h4>Region:  ${data.region}</h4></div> </div>
         <div><div><h4>Organisation:  ${data.org}</h4></div> <div><h4>Hostname:  ${data.org}</h4></div> </div>
         `;
 
-        pin = data.zip;
+        pin = data.postal;
 
        
-        displayMap(data.lat, data.lon);
-        getPostOffices(data.zip);
+        displayMap(lat, lon);
+        getPostOffices(pin);
         getTime(data.timezone);
         
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
       });
   }
 
@@ -66,12 +68,11 @@ button.addEventListener("click", ()=>{
       .then((response) => response.json())
       .then((data) => {
         postOffices = data[0].PostOffice;
-        number = postOffices.length;
         printpostoffices(postOffices);
         
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
       });
   }
 
@@ -95,7 +96,7 @@ button.addEventListener("click", ()=>{
 
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
       });
   }
 
